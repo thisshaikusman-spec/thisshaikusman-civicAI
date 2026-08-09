@@ -23,17 +23,6 @@ interface CreatedComplaintResponse {
   updated_at: string | null
 }
 
-interface RiskAnalysisResult {
-  category: string
-  department: string
-  priority: string
-  confidence: number
-  urgency_score: number
-  risk_level: string
-  risk_factors: string[]
-  ai_assessment: string
-}
-
 export default function SubmitComplaintPage() {
   const router = useRouter()
   const [name, setName] = useState('')
@@ -48,46 +37,6 @@ export default function SubmitComplaintPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [createdComplaint, setCreatedComplaint] = useState<CreatedComplaintResponse | null>(null)
-
-  // AI Risk Analyzer states
-  const [analyzingRisk, setAnalyzingRisk] = useState(false)
-  const [riskAnalysis, setRiskAnalysis] = useState<RiskAnalysisResult | null>(null)
-  const [riskError, setRiskError] = useState('')
-
-  const handleAnalyzeRisk = async () => {
-    if (!title.trim() || !description.trim()) {
-      setRiskError('Please enter both a Title and Description first to analyze problem risk.')
-      return
-    }
-    setAnalyzingRisk(true)
-    setRiskError('')
-
-    try {
-      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://127.0.0.1:8000'
-      const res = await fetch(`${baseUrl}/complaints/analyze-preview`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim(),
-        }),
-      })
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.detail || 'Failed to analyze problem risk.')
-      }
-
-      const data: RiskAnalysisResult = await res.json()
-      setRiskAnalysis(data)
-    } catch (err: any) {
-      setRiskError(err?.message || 'Error connecting to AI Risk Analyzer service.')
-    } finally {
-      setAnalyzingRisk(false)
-    }
-  }
 
   useEffect(() => {
     const userRaw = localStorage.getItem('user')
@@ -272,34 +221,30 @@ export default function SubmitComplaintPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* Navbar */}
-      <nav style={{ background: 'var(--surface-card)', borderBottom: '1px solid var(--surface-border)' }}>
-        <PageContainer className="flex items-center justify-between py-4">
-          <Link href="/citizen/dashboard" className="flex items-center gap-2.5 text-decoration-none">
-            <div 
-              style={{
-                background: 'var(--accent)',
-                color: 'var(--text-light)',
-                boxShadow: '0 4px 14px rgba(104,109,85,0.25)',
-              }}
-              className="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-base"
-            >
-              C
-            </div>
-            <span className="font-extrabold text-lg" style={{ color: 'var(--text-main)' }}>CivicAI</span>
+      <nav style={{
+        width: '100%',
+        position: 'sticky', top: 0, zIndex: 50,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        backdropFilter: 'blur(16px)',
+        background: '#0b1d3a',
+      }}>
+        <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
+          <Link href="/citizen/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
           </Link>
-          <div className="flex items-center gap-5">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <Link 
               href="/citizen/dashboard" 
-              className="text-sm font-medium transition-colors"
-              style={{ color: 'var(--text-muted)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-main)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
             >
               ← Dashboard
             </Link>
             <ProfileMenu />
           </div>
-        </PageContainer>
+        </div>
       </nav>
 
       <main className="py-10">
@@ -368,46 +313,7 @@ export default function SubmitComplaintPage() {
 
               {/* Issue Details */}
               <div className="card p-6 space-y-4">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h2 className="section-label mb-0">Complaint Details</h2>
-                  <button
-                    type="button"
-                    onClick={handleAnalyzeRisk}
-                    disabled={analyzingRisk}
-                    style={{
-                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                      color: '#ffffff',
-                      boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)',
-                    }}
-                    className="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 cursor-pointer border-0"
-                  >
-                    {analyzingRisk ? (
-                      <>
-                        <span className="animate-spin text-sm">⌛</span>
-                        Analyzing Risk...
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-sm">⚡</span>
-                        AI Risk Analyser
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {riskError && (
-                  <div 
-                    style={{
-                      background: 'var(--danger-dim)',
-                      borderColor: 'rgba(239, 68, 68, 0.3)',
-                      color: 'var(--danger)',
-                    }}
-                    className="p-3.5 rounded-xl border text-xs font-medium flex items-center justify-between"
-                  >
-                    <span>⚠️ {riskError}</span>
-                    <button type="button" onClick={() => setRiskError('')} className="opacity-70 hover:opacity-100 text-xs">✕</button>
-                  </div>
-                )}
+                <h2 className="section-label">Complaint Details</h2>
                 
                 <div>
                   <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--text-muted)' }}>Title *</label>
@@ -432,102 +338,6 @@ export default function SubmitComplaintPage() {
                     className="field leading-relaxed resize-none"
                   />
                 </div>
-
-                {/* AI Risk Analysis Report */}
-                {riskAnalysis && (
-                  <div 
-                    style={{
-                      background: 'linear-gradient(145deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.8) 100%)',
-                      border: '1px solid rgba(148, 163, 184, 0.2)',
-                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.25)',
-                      backdropFilter: 'blur(12px)',
-                    }}
-                    className="card p-5 space-y-4 rounded-2xl transition-all mt-4"
-                  >
-                    <div className="flex flex-wrap items-center justify-between gap-2 pb-3" style={{ borderBottom: '1px solid var(--surface-border)' }}>
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm" style={{ background: 'var(--accent)', color: '#fff' }}>
-                          🤖
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-sm text-white">AI Risk Analysis Report</h3>
-                          <p className="text-xs text-gray-400">Automated AI problem & urgency assessment</p>
-                        </div>
-                      </div>
-                      <div 
-                        style={{
-                          background: riskAnalysis.urgency_score >= 80 ? 'rgba(239,68,68,0.2)' : riskAnalysis.urgency_score >= 60 ? 'rgba(245,158,11,0.2)' : 'rgba(16,185,129,0.2)',
-                          color: riskAnalysis.urgency_score >= 80 ? '#ef4444' : riskAnalysis.urgency_score >= 60 ? '#f59e0b' : '#10b981',
-                          border: `1px solid ${riskAnalysis.urgency_score >= 80 ? '#ef4444' : riskAnalysis.urgency_score >= 60 ? '#f59e0b' : '#10b981'}`,
-                        }}
-                        className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider"
-                      >
-                        {riskAnalysis.risk_level}
-                      </div>
-                    </div>
-
-                    <div className="grid sm:grid-cols-3 gap-3">
-                      <div className="sm:col-span-1 p-3.5 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--surface-border)' }}>
-                        <div className="flex justify-between items-center mb-1">
-                          <span className="text-xs text-gray-400 font-medium">Urgency Score</span>
-                          <span className="text-xs font-bold text-white">{riskAnalysis.urgency_score}/100</span>
-                        </div>
-                        <div className="w-full h-2.5 rounded-full overflow-hidden bg-gray-700 mb-2">
-                          <div 
-                            className="h-full rounded-full transition-all duration-500"
-                            style={{ 
-                              width: `${riskAnalysis.urgency_score}%`,
-                              background: riskAnalysis.urgency_score >= 80 ? 'linear-gradient(90deg, #f59e0b, #ef4444)' : riskAnalysis.urgency_score >= 60 ? 'linear-gradient(90deg, #10b981, #f59e0b)' : 'linear-gradient(90deg, #0ea5e9, #10b981)',
-                            }}
-                          />
-                        </div>
-                        <span className="text-[11px] text-gray-400">
-                          Priority: <strong className="text-white">{riskAnalysis.priority}</strong>
-                        </span>
-                      </div>
-
-                      <div className="sm:col-span-2 p-3.5 rounded-xl flex flex-col justify-between" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--surface-border)' }}>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div>
-                            <span className="text-gray-400 block mb-0.5">Detected Category</span>
-                            <span className="font-semibold text-white">{riskAnalysis.category}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-400 block mb-0.5">Routed Department</span>
-                            <span className="font-semibold text-white">{riskAnalysis.department}</span>
-                          </div>
-                        </div>
-                        <div className="mt-2 text-[11px] text-emerald-400 font-medium">
-                          Confidence Score: {Math.round(riskAnalysis.confidence * 100)}%
-                        </div>
-                      </div>
-                    </div>
-
-    <div>
-      <span className="text-xs text-gray-400 font-medium block mb-1.5">Identified Risk Factors:</span>
-      <div className="flex flex-wrap gap-1.5">
-        {riskAnalysis.risk_factors.map((factor, idx) => (
-          <span 
-            key={idx}
-            style={{
-              background: 'rgba(239,68,68,0.12)',
-              color: '#f87171',
-              border: '1px solid rgba(239,68,68,0.25)',
-            }}
-            className="px-2.5 py-1 rounded-lg text-xs font-medium flex items-center gap-1"
-          >
-            <span>⚠️</span> {factor}
-          </span>
-        ))}
-      </div>
-    </div>
-
-                    <div className="p-3.5 rounded-xl text-xs leading-relaxed" style={{ background: 'rgba(14,165,233,0.08)', border: '1px solid rgba(14,165,233,0.2)', color: '#e0f2fe' }}>
-                      <strong className="text-sky-300 block mb-1">AI Recommendation:</strong>
-                      {riskAnalysis.ai_assessment}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Location Details */}

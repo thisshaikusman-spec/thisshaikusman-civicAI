@@ -27,6 +27,30 @@ export default function CitizenComplaintsPage() {
   const [complaints, setComplaints] = useState<ComplaintResponse[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
+
+  const handleWithdrawComplaint = async (complaintId: string) => {
+    setWithdrawingId(complaintId)
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://127.0.0.1:8000'
+      const res = await fetch(`${baseUrl}/complaints/${complaintId}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        throw new Error(`Backend returned status ${res.status}`)
+      }
+
+      setComplaints((prev) => prev.filter((c) => c.complaint_id !== complaintId))
+      setConfirmingId(null)
+    } catch (err) {
+      console.error('Error deleting complaint:', err)
+      alert('Failed to withdraw complaint. Please try again.')
+    } finally {
+      setWithdrawingId(null)
+    }
+  }
 
   useEffect(() => {
     const userRaw = localStorage.getItem('user')
@@ -98,39 +122,33 @@ export default function CitizenComplaintsPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* Navbar */}
-      <nav style={{ background: 'var(--surface-card)', borderBottom: '1px solid var(--surface-border)' }}>
-        <PageContainer className="flex items-center justify-between py-4">
-          <div className="flex items-center gap-3">
-            <Link href="/citizen/dashboard" className="flex items-center gap-2.5 text-decoration-none">
-              <div 
-                style={{
-                  background: 'var(--accent)',
-                  color: 'var(--text-light)',
-                  boxShadow: '0 4px 14px rgba(104,109,85,0.25)',
-                }}
-                className="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-base"
-              >
-                C
-              </div>
-              <span className="font-extrabold text-lg" style={{ color: 'var(--text-main)' }}>CivicAI</span>
-            </Link>
-          </div>
-          <div className="flex items-center gap-5">
+      <nav style={{
+        width: '100%',
+        position: 'sticky', top: 0, zIndex: 50,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        backdropFilter: 'blur(16px)',
+        background: '#0b1d3a',
+      }}>
+        <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
+          <Link href="/citizen/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
             <Link 
               href="/citizen/dashboard" 
-              className="text-sm font-medium transition-colors"
-              style={{ color: 'var(--text-muted)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-main)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
             >
               Dashboard
             </Link>
-            <Link href="/citizen/submit" className="btn-primary px-4 py-2 text-sm font-semibold">
+            <Link href="/citizen/submit" className="btn-primary" style={{ padding: '0.6rem 1.35rem', fontSize: '1.05rem', fontWeight: 700 }}>
               + Submit
             </Link>
             <ProfileMenu />
           </div>
-        </PageContainer>
+        </div>
       </nav>
 
       <main className="py-10">
@@ -186,9 +204,66 @@ export default function CitizenComplaintsPage() {
                         <h3 className="font-semibold text-lg" style={{ color: 'var(--text-main)' }}>{complaint.title}</h3>
                         <p className="text-sm mt-1.5 line-clamp-2" style={{ color: 'var(--text-muted)' }}>{complaint.description}</p>
                       </div>
-                      <div className="text-right text-xs whitespace-nowrap" style={{ color: 'var(--text-faint)' }}>
+                      <div className="text-right text-xs whitespace-nowrap flex flex-col items-end gap-1.5" style={{ color: 'var(--text-faint)' }}>
                         <div>{new Date(complaint.created_at).toLocaleDateString()}</div>
-                        <div className="mt-1 font-medium" style={{ color: 'var(--text-muted)' }}>{complaint.location}</div>
+                        <div className="font-medium" style={{ color: 'var(--text-muted)' }}>{complaint.location}</div>
+                        {confirmingId === complaint.complaint_id ? (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-xs font-semibold" style={{ color: '#ef4444' }}>Withdraw?</span>
+                            <button
+                              onClick={() => handleWithdrawComplaint(complaint.complaint_id)}
+                              disabled={withdrawingId === complaint.complaint_id}
+                              className="px-2.5 py-1 rounded-md text-xs font-bold transition-all"
+                              style={{
+                                background: '#ef4444',
+                                color: '#ffffff',
+                                border: 'none',
+                                cursor: withdrawingId === complaint.complaint_id ? 'not-allowed' : 'pointer',
+                                opacity: withdrawingId === complaint.complaint_id ? 0.7 : 1,
+                              }}
+                            >
+                              {withdrawingId === complaint.complaint_id ? 'Withdrawing...' : 'Yes'}
+                            </button>
+                            <button
+                              onClick={() => setConfirmingId(null)}
+                              disabled={withdrawingId === complaint.complaint_id}
+                              className="px-2.5 py-1 rounded-md text-xs font-medium transition-all"
+                              style={{
+                                background: 'var(--surface-border)',
+                                color: 'var(--text-muted)',
+                                border: 'none',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmingId(complaint.complaint_id)}
+                            className="mt-1 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.08)',
+                              color: '#ef4444',
+                              border: '1px solid rgba(239, 68, 68, 0.2)',
+                              cursor: 'pointer',
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.16)'
+                              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)'
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'
+                              e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)'
+                            }}
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="3 6 5 6 21 6"></polyline>
+                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                            Withdraw Complaint
+                          </button>
+                        )}
                       </div>
                     </div>
 

@@ -96,41 +96,46 @@ export default function Home() {
 
       {/* ── Navbar ── */}
       <nav style={{
+        width: '100%',
         position: 'sticky', top: 0, zIndex: 50,
-        borderBottom: scrolled ? '1px solid var(--surface-border)' : '1px solid transparent',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         backdropFilter: 'blur(16px)',
-        background: scrolled ? 'rgba(239,235,228,0.92)' : 'rgba(239,235,228,0.7)',
-        transition: 'background 0.3s, border-color 0.3s',
+        background: '#0b1d3a',
       }}>
-        <PageContainer style={{ display: 'flex', alignItems: 'center', height: '80px', gap: '2rem' }}>
+        <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', height: '80px', justifyContent: 'space-between' }}>
 
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent)', color: 'var(--text-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(104,109,85,0.25)' }}>C</div>
-            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: 'var(--text-main)', letterSpacing: '-0.01em' }}>CivicAI</span>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
           </Link>
 
           {/* Center nav links — desktop only */}
-          <div className="center-nav" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, justifyContent: 'center' }}>
+          <div className="center-nav" style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, justifyContent: 'center' }}>
             {NAV_LINKS.map(l => (
-              <a key={l.label} href={l.href} style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.15rem', color: 'var(--text-muted)', textDecoration: 'none', fontWeight: 600, transition: 'color 0.15s, background 0.15s' }}
-                onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-main)'; e.currentTarget.style.background = 'var(--surface-hover)' }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'transparent' }}
+              <a key={l.label} href={l.href} style={{ padding: '0.6rem 1.35rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
+                onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+                onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
               >{l.label}</a>
             ))}
           </div>
 
           {/* Right CTA — desktop */}
           <div className="desktop-cta" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
-            <Link href="/login" className="btn-primary" style={{ padding: '0.7rem 1.5rem', fontSize: '1.05rem' }}>Get Started</Link>
+            <Link href="/login" className="btn-primary" style={{
+              padding: '0.65rem 1.4rem',
+              fontSize: '1rem',
+              borderRadius: '12px',
+              textDecoration: 'none',
+            }}>Get Started</Link>
           </div>
 
           {/* Hamburger — mobile */}
           <button className="hamburger" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle menu"
-            style={{ background: 'none', border: 'none', color: 'var(--text-main)', cursor: 'pointer', padding: '0.25rem', display: 'none', marginLeft: 'auto' }}>
+            style={{ background: 'none', border: 'none', color: '#ffffff', cursor: 'pointer', padding: '0.25rem', display: 'none', marginLeft: 'auto' }}>
             {menuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
-        </PageContainer>
+        </div>
 
         {/* Mobile drawer */}
         <AnimatePresence>
@@ -317,7 +322,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px,1fr) repeat(2, auto)', gap: '3.5rem 6rem', flexWrap: 'wrap', marginBottom: '3.5rem' }} className="footer-grid">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent)', color: 'var(--text-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.15rem' }}>C</div>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.15rem', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}>C</div>
                 <span style={{ fontWeight: 800, fontSize: '1.2rem' }}>CivicAI</span>
               </div>
               <p style={{ fontSize: '1rem', color: 'var(--text-faint)', lineHeight: 1.7, maxWidth: '280px' }}>AI-powered municipal complaint management for faster civic resolution.</p>

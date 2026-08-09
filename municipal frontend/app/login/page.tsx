@@ -116,15 +116,24 @@ function LoginForm() {
         {/* Logo & Header */}
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', marginBottom: '1rem' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent)', color: 'var(--text-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.25rem', boxShadow: '0 6px 20px rgba(104,109,85,0.25)' }}>C</div>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.25rem', boxShadow: '0 6px 20px rgba(16,185,129,0.3)' }}>C</div>
             <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>CivicAI</span>
           </Link>
           <h1 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-main)', marginBottom: '0.35rem' }}>Welcome Back</h1>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Sign in to access your civic portal</p>
         </div>
 
-        {/* Interactive Role Tabs */}
-        <div style={{ display: 'flex', background: 'var(--bg-card-light)', padding: '0.35rem', borderRadius: '14px', marginBottom: '1.25rem', border: '1px solid var(--surface-border)' }}>
+        {/* Interactive Navy Blue Role Tabs */}
+        <div style={{
+          display: 'flex',
+          background: '#0b1d3a',
+          padding: '0.45rem',
+          borderRadius: '16px',
+          marginBottom: '1.5rem',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 10px 30px rgba(11, 29, 58, 0.3)',
+          gap: '0.5rem',
+        }}>
           <button
             type="button"
             onClick={() => handleTabChange('citizen')}
@@ -133,21 +142,41 @@ function LoginForm() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.5rem',
-              padding: '0.7rem',
-              borderRadius: '10px',
-              border: 'none',
-              fontSize: '0.9rem',
+              gap: '0.6rem',
+              padding: '0.8rem 1rem',
+              borderRadius: '12px',
+              border: activeTab === 'citizen' ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid transparent',
+              fontSize: '0.95rem',
               fontWeight: 700,
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              background: activeTab === 'citizen' ? 'var(--surface-card)' : 'transparent',
-              color: activeTab === 'citizen' ? 'var(--accent)' : 'var(--text-muted)',
-              boxShadow: activeTab === 'citizen' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 'citizen'
+                ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)'
+                : 'transparent',
+              color: activeTab === 'citizen' ? '#ffffff' : '#94a3b8',
+              boxShadow: activeTab === 'citizen' ? '0 4px 16px rgba(14, 165, 233, 0.4)' : 'none',
+              transform: activeTab === 'citizen' ? 'scale(1.02)' : 'scale(1)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'citizen') {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'
+                e.currentTarget.style.color = '#ffffff'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'citizen') {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.color = '#94a3b8'
+              }
             }}
           >
-            <User size={16} /> Citizen
+            <User size={18} />
+            <span>Citizen</span>
+            {activeTab === 'citizen' && (
+              <span style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.25)', padding: '0.15rem 0.4rem', borderRadius: '999px', fontWeight: 800 }}>ACTIVE</span>
+            )}
           </button>
+
           <button
             type="button"
             onClick={() => handleTabChange('officer')}
@@ -156,20 +185,39 @@ function LoginForm() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.5rem',
-              padding: '0.7rem',
-              borderRadius: '10px',
-              border: 'none',
-              fontSize: '0.9rem',
+              gap: '0.6rem',
+              padding: '0.8rem 1rem',
+              borderRadius: '12px',
+              border: activeTab === 'officer' ? '1px solid rgba(52, 211, 153, 0.5)' : '1px solid transparent',
+              fontSize: '0.95rem',
               fontWeight: 700,
               cursor: 'pointer',
-              transition: 'all 0.2s',
-              background: activeTab === 'officer' ? 'var(--surface-card)' : 'transparent',
-              color: activeTab === 'officer' ? 'var(--accent)' : 'var(--text-muted)',
-              boxShadow: activeTab === 'officer' ? '0 2px 8px rgba(0,0,0,0.06)' : 'none',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              background: activeTab === 'officer'
+                ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+                : 'transparent',
+              color: activeTab === 'officer' ? '#ffffff' : '#94a3b8',
+              boxShadow: activeTab === 'officer' ? '0 4px 16px rgba(16, 185, 129, 0.4)' : 'none',
+              transform: activeTab === 'officer' ? 'scale(1.02)' : 'scale(1)',
+            }}
+            onMouseEnter={(e) => {
+              if (activeTab !== 'officer') {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.12)'
+                e.currentTarget.style.color = '#ffffff'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== 'officer') {
+                e.currentTarget.style.background = 'transparent'
+                e.currentTarget.style.color = '#94a3b8'
+              }
             }}
           >
-            <Shield size={16} /> Officer
+            <Shield size={18} />
+            <span>Officer</span>
+            {activeTab === 'officer' && (
+              <span style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.25)', padding: '0.15rem 0.4rem', borderRadius: '999px', fontWeight: 800 }}>ACTIVE</span>
+            )}
           </button>
         </div>
 

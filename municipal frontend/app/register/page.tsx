@@ -61,7 +61,7 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: '440px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.125rem', color: 'var(--text-light)', boxShadow: '0 4px 14px rgba(104,109,85,0.25)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.125rem', color: '#ffffff', boxShadow: '0 4px 14px rgba(16,185,129,0.3)' }}>
               C
             </div>
             <span style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>CivicAI</span>
@@ -95,17 +95,30 @@ export default function RegisterPage() {
               <p style={{ fontSize: '0.75rem', color: 'var(--text-faint)', marginTop: '0.25rem' }}>Minimum 8 characters</p>
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>I am a</label>
-              <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>I am a</label>
+              <div style={{
+                display: 'flex',
+                background: '#0b1d3a',
+                padding: '0.45rem',
+                borderRadius: '14px',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                gap: '0.4rem',
+              }}>
                 <button
                   type="button"
                   onClick={() => setRole('citizen')}
                   style={{
-                    flex: 1, padding: '0.6rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
-                    border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
-                    background: role === 'citizen' ? 'var(--accent-dim)' : 'transparent',
-                    borderColor: role === 'citizen' ? 'var(--accent-border)' : 'var(--surface-border)',
-                    color: role === 'citizen' ? 'var(--accent)' : 'var(--text-muted)',
+                    flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700,
+                    border: role === 'citizen' ? '1px solid rgba(56, 189, 248, 0.5)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.2s',
+                    background: role === 'citizen' ? 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)' : 'transparent',
+                    color: role === 'citizen' ? '#ffffff' : '#94a3b8',
+                    boxShadow: role === 'citizen' ? '0 4px 14px rgba(14, 165, 233, 0.35)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (role !== 'citizen') e.currentTarget.style.color = '#ffffff'
+                  }}
+                  onMouseLeave={(e) => {
+                    if (role !== 'citizen') e.currentTarget.style.color = '#94a3b8'
                   }}
                 >
                   👤 Citizen
@@ -114,11 +127,17 @@ export default function RegisterPage() {
                   type="button"
                   onClick={() => setRole('officer')}
                   style={{
-                    flex: 1, padding: '0.6rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
-                    border: '1px solid', cursor: 'pointer', transition: 'all 0.15s',
-                    background: role === 'officer' ? 'var(--accent-dim)' : 'transparent',
-                    borderColor: role === 'officer' ? 'var(--accent-border)' : 'var(--surface-border)',
-                    color: role === 'officer' ? 'var(--accent)' : 'var(--text-muted)',
+                    flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700,
+                    border: role === 'officer' ? '1px solid rgba(52, 211, 153, 0.5)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.2s',
+                    background: role === 'officer' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+                    color: role === 'officer' ? '#ffffff' : '#94a3b8',
+                    boxShadow: role === 'officer' ? '0 4px 14px rgba(16, 185, 129, 0.35)' : 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (role !== 'officer') e.currentTarget.style.color = '#ffffff'
+                  }}
+                  onMouseLeave={(e) => {
+                    if (role !== 'officer') e.currentTarget.style.color = '#94a3b8'
                   }}
                 >
                   🛡️ Officer

@@ -55,14 +55,39 @@ const PRIORITY_COLOR: Record<string, string> = {
 
 export default function CitizenDashboardClient({
   userName,
-  complaints,
+  complaints: initialComplaints,
   demoNotifications,
 }: CitizenDashboardClientProps) {
+  const [complaintList, setComplaintList] = useState<ComplaintResponse[]>(initialComplaints)
   const [activeFilter, setActiveFilter] = useState<'all' | 'resolved' | 'in_progress' | 'notifications'>('all')
+  const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
+  const [confirmingId, setConfirmingId] = useState<string | null>(null)
   const notifSectionRef = useRef<HTMLDivElement>(null)
 
-  const resolvedComplaints = complaints.filter(c => ['resolved', 'RESOLVED'].includes(c.status))
-  const inProgressComplaints = complaints.filter(c => ['in progress', 'IN_PROGRESS', 'in_progress'].includes(c.status.toLowerCase()))
+  const handleWithdrawComplaint = async (complaintId: string) => {
+    setWithdrawingId(complaintId)
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://127.0.0.1:8000'
+      const res = await fetch(`${baseUrl}/complaints/${complaintId}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        throw new Error(`Backend returned status ${res.status}`)
+      }
+
+      setComplaintList((prev) => prev.filter((c) => c.complaint_id !== complaintId))
+      setConfirmingId(null)
+    } catch (err) {
+      console.error('Error deleting complaint:', err)
+      alert('Failed to withdraw complaint. Please try again.')
+    } finally {
+      setWithdrawingId(null)
+    }
+  }
+
+  const resolvedComplaints = complaintList.filter(c => ['resolved', 'RESOLVED'].includes(c.status))
+  const inProgressComplaints = complaintList.filter(c => ['in progress', 'IN_PROGRESS', 'in_progress'].includes(c.status.toLowerCase()))
   const unreadNotifs = demoNotifications.filter((n) => !n.read).length
 
   const handleStatClick = (key: 'all' | 'resolved' | 'in_progress' | 'notifications') => {
@@ -73,7 +98,7 @@ export default function CitizenDashboardClient({
   }
 
   // Filter complaints based on active selection
-  const filteredComplaints = complaints.filter((c) => {
+  const filteredComplaints = complaintList.filter((c) => {
     if (activeFilter === 'resolved') {
       return ['resolved', 'RESOLVED'].includes(c.status)
     }
@@ -87,10 +112,10 @@ export default function CitizenDashboardClient({
     {
       key: 'all' as const,
       label: 'Total Complaints',
-      value: complaints.length,
+      value: complaintList.length,
       accent: 'var(--accent)',
-      glow: 'rgba(14,165,233,0.35)',
-      activeBorder: '#0ea5e9',
+      glow: 'rgba(16,185,129,0.35)',
+      activeBorder: '#10b981',
     },
     {
       key: 'resolved' as const,
@@ -122,23 +147,30 @@ export default function CitizenDashboardClient({
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* ── Navbar ── */}
       <nav style={{
-        borderBottom: '1px solid var(--surface-border)',
-        backdropFilter: 'blur(14px)',
-        background: 'var(--surface-card)',
-        position: 'sticky', top: 0, zIndex: 40,
+        width: '100%',
+        position: 'sticky', top: 0, zIndex: 50,
+        borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
+        backdropFilter: 'blur(16px)',
+        background: '#0b1d3a',
       }}>
-        <PageContainer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-            <div style={{ width: '34px', height: '34px', borderRadius: '8px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1rem', boxShadow: '0 0 12px rgba(14,165,233,0.4)' }}>C</div>
-            <span style={{ fontWeight: 800, fontSize: '1.1rem' }}>CivicAI</span>
-            <span style={{ color: 'var(--text-faint)', fontSize: '0.9rem' }}>/ Citizen</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Link href="/citizen/complaints" className="nav-link">My Complaints</Link>
-            <Link href="/citizen/submit" className="nav-link">Submit</Link>
+        <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
+          <Link href="/citizen/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
+            <span style={{ color: '#94a3b8', fontSize: '1.05rem', fontWeight: 600 }}>/ Citizen</span>
+          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <Link href="/citizen/complaints" style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
+            >My Complaints</Link>
+            <Link href="/citizen/submit" style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
+              onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
+              onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
+            >Submit</Link>
             <ProfileMenu />
           </div>
-        </PageContainer>
+        </div>
       </nav>
 
       {/* ── Main ── */}
@@ -195,24 +227,6 @@ export default function CitizenDashboardClient({
                     }
                   }}
                 >
-                  {isActive && (
-                    <span style={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '12px',
-                      fontSize: '0.7rem',
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                      color: stat.accent,
-                      background: 'rgba(255,255,255,0.06)',
-                      padding: '2px 8px',
-                      borderRadius: '99px',
-                      border: `1px solid ${stat.activeBorder}`,
-                    }}>
-                      Active Filter
-                    </span>
-                  )}
                   <div style={{ fontSize: '2.5rem', fontWeight: 800, color: stat.accent, lineHeight: 1.1 }}>
                     {stat.value}
                   </div>
@@ -310,9 +324,80 @@ export default function CitizenDashboardClient({
                             <div style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: 'var(--text-faint)', marginBottom: '0.3rem' }}>{c.complaint_id}</div>
                             <h3 style={{ fontWeight: 600, fontSize: '1.05rem', lineHeight: 1.4 }}>{c.title}</h3>
                           </div>
-                          <span style={{ flexShrink: 0, padding: '0.3rem 0.85rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 700, background: s.bg, color: s.color, border: `1px solid ${s.border}` }}>
-                            {c.status}
-                          </span>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                            <span style={{ flexShrink: 0, padding: '0.3rem 0.85rem', borderRadius: '999px', fontSize: '0.8rem', fontWeight: 700, background: s.bg, color: s.color, border: `1px solid ${s.border}` }}>
+                              {c.status}
+                            </span>
+                            {confirmingId === c.complaint_id ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ef4444' }}>Withdraw?</span>
+                                <button
+                                  onClick={() => handleWithdrawComplaint(c.complaint_id)}
+                                  disabled={withdrawingId === c.complaint_id}
+                                  style={{
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    background: '#ef4444',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    cursor: withdrawingId === c.complaint_id ? 'not-allowed' : 'pointer',
+                                    opacity: withdrawingId === c.complaint_id ? 0.7 : 1,
+                                  }}
+                                >
+                                  {withdrawingId === c.complaint_id ? 'Withdrawing...' : 'Yes'}
+                                </button>
+                                <button
+                                  onClick={() => setConfirmingId(null)}
+                                  disabled={withdrawingId === c.complaint_id}
+                                  style={{
+                                    padding: '0.25rem 0.6rem',
+                                    borderRadius: '6px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 500,
+                                    background: 'var(--surface-border)',
+                                    color: 'var(--text-muted)',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmingId(c.complaint_id)}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  padding: '0.3rem 0.75rem',
+                                  borderRadius: '8px',
+                                  fontSize: '0.75rem',
+                                  fontWeight: 600,
+                                  background: 'rgba(239, 68, 68, 0.08)',
+                                  color: '#ef4444',
+                                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                                  cursor: 'pointer',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.16)'
+                                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.4)'
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)'
+                                  e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)'
+                                }}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="3 6 5 6 21 6"></polyline>
+                                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                                Withdraw Complaint
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
                           <span>{c.department}</span>

@@ -52,44 +52,44 @@ export default function OfficerAnalyticsPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* Navbar */}
-      <nav style={{ background: 'var(--surface-card)', borderBottom: '1px solid var(--surface-border)' }}>
-        <PageContainer className="flex items-center justify-between py-4">
+      <nav style={{ background: '#0b1d3a', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', width: '100%' }}>
+        <div style={{ width: '100%', padding: '1rem 2.5rem' }} className="flex items-center justify-between">
           <Link href="/officer/dashboard" className="flex items-center gap-2.5 text-decoration-none">
             <div 
               style={{
-                background: 'var(--accent)',
-                color: 'var(--text-light)',
-                boxShadow: '0 4px 14px rgba(104,109,85,0.25)',
+                background: '#10b981',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(16,185,129,0.35)',
               }}
               className="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-base"
             >
               C
             </div>
-            <span className="font-extrabold text-lg" style={{ color: 'var(--text-main)' }}>CivicAI</span>
-            <span className="text-sm font-medium" style={{ color: 'var(--text-faint)' }}>/ Analytics</span>
+            <span className="font-extrabold text-lg" style={{ color: '#ffffff' }}>CivicAI</span>
+            <span className="text-sm font-medium" style={{ color: '#94a3b8' }}>/ Analytics</span>
           </Link>
           <div className="flex items-center gap-5">
             <Link 
               href="/officer/dashboard" 
               className="text-sm font-medium transition-colors"
-              style={{ color: 'var(--text-muted)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-main)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              style={{ color: '#cbd5e1' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
             >
               Dashboard
             </Link>
             <Link 
               href="/officer/complaints" 
               className="text-sm font-medium transition-colors"
-              style={{ color: 'var(--text-muted)' }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-main)')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-muted)')}
+              style={{ color: '#cbd5e1' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#cbd5e1')}
             >
               Complaints
             </Link>
             <ProfileMenu />
           </div>
-        </PageContainer>
+        </div>
       </nav>
 
       <main className="py-10">

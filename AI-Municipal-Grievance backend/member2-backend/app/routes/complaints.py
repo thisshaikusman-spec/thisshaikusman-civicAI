@@ -167,6 +167,22 @@ async def update_complaint_status(
     }
 
 
+@router.delete("/{complaint_id}", status_code=status.HTTP_200_OK)
+async def delete_complaint(complaint_id: str, db: Session = Depends(get_db)):
+    complaint = db.query(ComplaintDB).filter(ComplaintDB.complaint_id == complaint_id).first()
+    if not complaint:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Complaint {complaint_id} not found",
+        )
+    db.delete(complaint)
+    db.commit()
+    return {
+        "complaint_id": complaint_id,
+        "message": f"Complaint {complaint_id} deleted successfully",
+    }
+
+
 @router.post("/", response_model=ComplaintResponse, status_code=status.HTTP_201_CREATED)
 async def create_complaint(complaint: ComplaintCreate, db: Session = Depends(get_db)):
     try:
