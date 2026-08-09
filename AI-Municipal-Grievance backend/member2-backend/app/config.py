@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-secret-change-in-production"
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 60 * 24
+    gemini_api_key: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

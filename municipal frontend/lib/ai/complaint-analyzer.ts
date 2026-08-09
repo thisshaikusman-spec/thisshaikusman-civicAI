@@ -70,8 +70,8 @@ const KEYWORDS: Record<string, { category: string; dept: string; keywords: strin
 }
 
 const SEVERITY_KEYWORDS = {
-  CRITICAL: ['emergency', 'urgent', 'critical', 'dangerous', 'accident', 'injury', 'children', 'school', 'hospital', 'overflow', 'burst', 'collaps'],
-  HIGH: ['many', 'multiple', 'daily', 'week', 'bad', 'severe', 'serious', 'major', 'several', 'affected', 'blocked', 'falling'],
+  CRITICAL: ['infection', 'infections', 'disease', 'illness', 'sick', 'dengue', 'malaria', 'fever', 'mosquito', 'exposed wire', 'electric shock', 'gas leak', 'fire hazard', 'high voltage', 'building collapse', 'emergency', 'urgent', 'critical', 'dangerous', 'accident', 'injury', 'children', 'school', 'hospital', 'overflow', 'burst', 'collaps'],
+  HIGH: ['smell', 'stink', 'foul', 'health', 'blocked', 'clogged', 'choked', 'stagnant', 'many', 'multiple', 'daily', 'week', 'bad', 'severe', 'serious', 'major', 'several', 'affected', 'falling'],
   MEDIUM: ['few', 'some', 'inconvenient', 'issue', 'problem', 'need', 'fix'],
   LOW: ['minor', 'small', 'little', 'slight'],
 }
