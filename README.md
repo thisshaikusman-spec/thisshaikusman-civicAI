@@ -14,9 +14,9 @@ An end-to-end AI-powered municipal grievance & complaint routing platform featur
 
 ## 🛠️ Deployment Instructions
 
-### 1. Frontend Deployment (Vercel)
+### 1. Deployment (Render / Vercel)
 
-The Next.js frontend is located inside the `municipal frontend/` directory.
+The Next.js frontend is located inside `municipal frontend/`. Render automatically deploys using `render.yaml`.
 
 #### Steps to deploy to Vercel:
 ```bash
