@@ -12,7 +12,7 @@ function createPrismaClient(): PrismaClient {
   // Strip "file:" prefix for better-sqlite3 url config
   const dbPath = rawUrl.replace(/^file:\.\//, '')
   // Resolve to absolute path from project root
-  const absolutePath = path.resolve(process.cwd(), dbPath)
+  const absolutePath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), dbPath)
 
   const adapter = new PrismaBetterSqlite3({ url: absolutePath })
   return new PrismaClient({ adapter } as any)
