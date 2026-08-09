@@ -1,0 +1,209 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  CITIZEN
+  OFFICER
+  ADMIN
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  AI_VERIFIED
+  DUPLICATE
+  ROUTED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+  REJECTED
+  ESCALATED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EvidenceType {
+  BEFORE
+  AFTER
+  SUPPORTING
+}
+
+enum EscalationLevel {
+  NONE
+  LEVEL1
+  LEVEL2
+  LEVEL3
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(CITIZEN)
+  phone         String?
+  ward          String?
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  complaints       Complaint[]      @relation("CitizenComplaints")
+  assignedComplaints Complaint[]    @relation("OfficerComplaints")
+  statusHistory    ComplaintStatusHistory[]
+  supports         ComplaintSupport[]
+  notifications    Notification[]
+}
+
+model Complaint {
+  id              String          @id @default(cuid())
+  civicId         String          @unique
+  title           String
+  description     String
+  originalText    String
+  category        String
+  severity        Severity        @default(MEDIUM)
+  priority        Priority        @default(MEDIUM)
+  priorityScore   Int             @default(50)
+  status          ComplaintStatus @default(SUBMITTED)
+  ward            String
+  municipality    String
+  department      String
+  address         String
+  latitude        Float           @default(10.7905)
+  longitude       Float           @default(78.7047)
+  aiConfidence    Float           @default(0.0)
+  aiReasoning     String?
+  language        String          @default("english")
+  supportCount    Int             @default(0)
+  slaHours        Int             @default(48)
+  slaDeadline     DateTime?
+  slaBreached     Boolean         @default(false)
+  escalationLevel EscalationLevel @default(NONE)
+  duplicateOfId   String?
+  officialComplaint String?
+  resolutionNote  String?
+  resolvedAt      DateTime?
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  citizen         User            @relation("CitizenComplaints", fields: [citizenId], references: [id])
+  citizenId       String
+  officer         User?           @relation("OfficerComplaints", fields: [officerId], references: [id])
+  officerId       String?
+  duplicateOf     Complaint?      @relation("Duplicates", fields: [duplicateOfId], references: [id])
+  duplicates      Complaint[]     @relation("Duplicates")
+
+  evidence        ComplaintEvidence[]
+  statusHistory   ComplaintStatusHistory[]
+  supports        ComplaintSupport[]
+  notifications   Notification[]
+  aiAnalysis      AIAnalysis?
+}
+
+model ComplaintEvidence {
+  id          String       @id @default(cuid())
+  complaintId String
+  url         String
+  type        EvidenceType @default(SUPPORTING)
+  caption     String?
+  uploadedAt  DateTime     @default(now())
+
+  complaint   Complaint    @relation(fields: [complaintId], references: [id])
+}
+
+model ComplaintStatusHistory {
+  id          String          @id @default(cuid())
+  complaintId String
+  status      ComplaintStatus
+  comment     String?
+  changedById String
+  changedAt   DateTime        @default(now())
+
+  complaint   Complaint       @relation(fields: [complaintId], references: [id])
+  changedBy   User            @relation(fields: [changedById], references: [id])
+}
+
+model ComplaintSupport {
+  id          String   @id @default(cuid())
+  complaintId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+
+  @@unique([complaintId, userId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String
+  title       String
+  message     String
+  read        Boolean  @default(false)
+  complaintId String?
+  createdAt   DateTime @default(now())
+
+  user        User      @relation(fields: [userId], references: [id])
+  complaint   Complaint? @relation(fields: [complaintId], references: [id])
+}
+
+model Department {
+  id           String  @id @default(cuid())
+  name         String
+  category     String
+  ward         String
+  municipality String
+  phone        String?
+  email        String?
+}
+
+model SLAConfig {
+  id       String @id @default(cuid())
+  category String @unique
+  hours    Int
+}
+
+model AIAnalysis {
+  id          String   @id @default(cuid())
+  complaintId String   @unique
+  category    String
+  severity    String
+  confidence  Float
+  reasoning   String
+  department  String
+  language    String
+  translation String?
+  createdAt   DateTime @default(now())
+
+  complaint   Complaint @relation(fields: [complaintId], references: [id])
+}
+
+model Ward {
+  id           String @id @default(cuid())
+  number       String
+  name         String
+  municipality String
+  officerId    String?
+}
