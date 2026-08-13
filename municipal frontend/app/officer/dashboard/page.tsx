@@ -10,7 +10,6 @@ import ComplaintMapWrapper from '@/components/ComplaintMapWrapper'
 import CountUpNumber from '@/components/motion/CountUpNumber'
 import AnimatedBadge from '@/components/motion/AnimatedBadge'
 import type { PhotoMetadata } from '@/components/ComplaintMapLocation'
-import QRScannerButton from '@/components/QRScannerButton'
 
 interface ComplaintResponse {
   complaint_id: string
@@ -276,7 +275,6 @@ function DashboardContent() {
             </Link>
           </div>
           <div className="flex items-center gap-5">
-            <QRScannerButton />
             <Link
               href="/officer/complaints"
               className="text-sm font-medium transition-colors"

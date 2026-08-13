@@ -8,9 +8,6 @@ import ProfileMenu from '@/components/ProfileMenu'
 import PageContainer from '@/components/PageContainer'
 import CountUpNumber from '@/components/motion/CountUpNumber'
 import AnimatedBadge from '@/components/motion/AnimatedBadge'
-import QRCodeGenerator from '@/components/QRCodeGenerator'
-import QRScannerButton from '@/components/QRScannerButton'
-import { QrCode, X } from 'lucide-react'
 
 interface ComplaintResponse {
   complaint_id: string
@@ -172,8 +169,6 @@ export default function CitizenDashboardClient({
     },
   ]
 
-  const [qrModalComplaint, setQrModalComplaint] = useState<ComplaintResponse | null>(null)
-
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* ── Navbar ── */}
@@ -191,7 +186,6 @@ export default function CitizenDashboardClient({
             <span style={{ color: '#94a3b8', fontSize: '1.05rem', fontWeight: 600 }}>/ Citizen</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <QRScannerButton />
             <Link href="/citizen/complaints" style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
               onMouseEnter={e => { e.currentTarget.style.color = '#ffffff'; e.currentTarget.style.background = 'rgba(255,255,255,0.1)' }}
               onMouseLeave={e => { e.currentTarget.style.color = '#e2e8f0'; e.currentTarget.style.background = 'transparent' }}
@@ -393,28 +387,7 @@ export default function CitizenDashboardClient({
                               >
                                 {c.status}
                               </AnimatedBadge>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                                <motion.button
-                                  whileTap={{ scale: 0.95 }}
-                                  onClick={() => setQrModalComplaint(c)}
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '0.35rem',
-                                    padding: '0.3rem 0.75rem',
-                                    borderRadius: '8px',
-                                    fontSize: '0.75rem',
-                                    fontWeight: 600,
-                                    background: 'var(--accent-dim)',
-                                    color: 'var(--accent)',
-                                    border: '1px solid var(--accent-border)',
-                                    cursor: 'pointer',
-                                  }}
-                                >
-                                  <QrCode size={12} />
-                                  QR Tag
-                                </motion.button>
-
+                              <div>
                                 {confirmingId === c.complaint_id ? (
                                   <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                     <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#ef4444' }}>Withdraw?</span>
@@ -583,87 +556,6 @@ export default function CitizenDashboardClient({
           </div>
         </PageContainer>
       </main>
-
-      {/* Complaint QR Code Modal */}
-      {qrModalComplaint && (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 100,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '1rem',
-            background: 'rgba(5, 11, 24, 0.82)',
-            backdropFilter: 'blur(16px)',
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              maxWidth: '420px',
-              background: 'var(--surface-card)',
-              border: '1px solid var(--surface-border)',
-              borderRadius: '24px',
-              padding: '1.5rem',
-              textAlign: 'center',
-              boxShadow: '0 24px 64px rgba(0,0,0,0.5)',
-              position: 'relative',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setQrModalComplaint(null)}
-              style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                padding: '0.4rem',
-              }}
-            >
-              <X size={20} />
-            </button>
-
-            <h3 style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-main)', margin: '0 0 0.25rem 0' }}>
-              Complaint QR Tag
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0 0 1.25rem 0' }}>
-              {qrModalComplaint.title}
-            </p>
-
-            <QRCodeGenerator
-              value={qrModalComplaint.complaint_id}
-              size={180}
-              title={qrModalComplaint.complaint_id}
-              subtitle={`${qrModalComplaint.category} • ${qrModalComplaint.location}`}
-              downloadFilename={`complaint-${qrModalComplaint.complaint_id}.png`}
-            />
-
-            <button
-              type="button"
-              onClick={() => setQrModalComplaint(null)}
-              style={{
-                marginTop: '1.25rem',
-                width: '100%',
-                padding: '0.65rem',
-                borderRadius: '12px',
-                background: 'var(--surface-border)',
-                color: 'var(--text-main)',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

@@ -6,11 +6,10 @@ import { useState, useEffect, useRef } from 'react'
 import {
   ClipboardList, CheckCircle2, Cog, AlertTriangle,
   FileText, Bot, MapPin, Menu, X, ArrowRight,
-  Shield, Clock, Users, ChevronRight, Activity, QrCode,
+  Shield, Clock, Users, ChevronRight, Activity,
 } from 'lucide-react'
 import { motion, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import PageContainer from '@/components/PageContainer'
-import QRScannerButton from '@/components/QRScannerButton'
 
 const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://127.0.0.1:8000'
 
@@ -123,7 +122,6 @@ export default function Home() {
 
           {/* Right CTA — desktop */}
           <div className="desktop-cta" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
-            <QRScannerButton variant="nav" />
             <Link href="/login" style={{
               padding: '0.6rem 1.25rem',
               fontSize: '0.95rem',
@@ -192,9 +190,6 @@ export default function Home() {
                 <Link href="/login" className="btn-primary" style={{ padding: '1.1rem 2.4rem', fontSize: '1.15rem', gap: '0.75rem' }}>
                   Submit a Complaint <ArrowRight size={22} />
                 </Link>
-              </motion.div>
-              <motion.div whileTap={{ scale: 0.95 }} transition={{ duration: 0.1 }} style={{ display: 'inline-block' }}>
-                <QRScannerButton variant="hero" />
               </motion.div>
               <motion.div whileTap={{ scale: 0.95 }} transition={{ duration: 0.1 }} style={{ display: 'inline-block' }}>
                 <a href="#how" className="btn-ghost" style={{ padding: '1.1rem 2.1rem', fontSize: '1.15rem' }}>

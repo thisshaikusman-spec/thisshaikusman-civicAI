@@ -11,8 +11,6 @@ import AnimatedButton from '@/components/motion/AnimatedButton'
 import VoiceAssistantToolbar, { SupportedLang } from '@/components/VoiceAssistantToolbar'
 import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { geocodeAddress } from '@/lib/geo'
-import QRCodeGenerator from '@/components/QRCodeGenerator'
-import QRScannerButton from '@/components/QRScannerButton'
 
 export interface PhotoMetadata {
   photo_url?: string
@@ -241,11 +239,6 @@ export default function SubmitComplaintPage() {
       if (qLoc) setLocation(qLoc)
     }
   }, [router])
-
-  const handleQRScanResult = (result: any) => {
-    if (result.title) setTitle(result.title)
-    if (result.location) setLocation(result.location)
-  }
 
   const [photoItems, setPhotoItems] = useState<PhotoItem[]>([])
   const [uploadError, setUploadError] = useState('')
@@ -502,14 +495,15 @@ export default function SubmitComplaintPage() {
               </div>
             )}
 
-            <div className="mb-6 flex flex-col items-center justify-center">
-              <QRCodeGenerator
-                value={createdComplaint.complaint_id}
-                size={160}
-                title="Official Complaint QR Code"
-                subtitle="Save or scan to track status on mobile"
-                downloadFilename={`civicai-${createdComplaint.complaint_id}.png`}
-              />
+            <div 
+              style={{
+                background: 'var(--surface-card)',
+                borderColor: 'var(--surface-border)',
+                color: 'var(--accent)',
+              }}
+              className="inline-block px-5 py-2 border rounded-xl font-mono text-xl font-semibold mb-6"
+            >
+              {createdComplaint.complaint_id}
             </div>
 
             <div className="card p-6 mb-6 text-left text-sm space-y-3">
@@ -605,7 +599,6 @@ export default function SubmitComplaintPage() {
             <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-            <QRScannerButton onScanResult={handleQRScanResult} />
             <Link 
               href="/citizen/dashboard" 
               style={{ padding: '0.6rem 1.25rem', borderRadius: '10px', fontSize: '1.1rem', color: '#e2e8f0', textDecoration: 'none', fontWeight: 600, transition: 'all 0.15s' }}
@@ -632,35 +625,6 @@ export default function SubmitComplaintPage() {
                   : 'Submit a Complaint form. You can type your complaint or click the microphone buttons to speak your title, description, and location.'
               }
             />
-
-            {/* Quick QR Scanner Asset Banner */}
-            <div 
-              style={{
-                background: 'var(--surface-card)',
-                border: '1px solid var(--accent-border)',
-                borderRadius: '16px',
-                padding: '1rem 1.25rem',
-                marginBottom: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                flexWrap: 'wrap',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ fontSize: '1.5rem' }}>📷</div>
-                <div>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-main)', margin: 0 }}>
-                    Scanning a Public Municipal QR Code?
-                  </h3>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                    Scan QR tags on streetlights, dumpsters, or public assets to auto-fill location & details!
-                  </p>
-                </div>
-              </div>
-              <QRScannerButton variant="inline" onScanResult={handleQRScanResult} />
-            </div>
 
             <div className="mb-8">
               <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--text-main)' }}>Submit a Complaint</h1>
