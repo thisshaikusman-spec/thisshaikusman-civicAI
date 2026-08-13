@@ -6,10 +6,11 @@ import { useState, useEffect, useRef } from 'react'
 import {
   ClipboardList, CheckCircle2, Cog, AlertTriangle,
   FileText, Bot, MapPin, Menu, X, ArrowRight,
-  Shield, Clock, Users, ChevronRight, Activity,
+  Shield, Clock, Users, ChevronRight, Activity, QrCode,
 } from 'lucide-react'
 import { motion, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import PageContainer from '@/components/PageContainer'
+import QRScannerButton from '@/components/QRScannerButton'
 
 const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://127.0.0.1:8000'
 
@@ -92,7 +93,7 @@ export default function Home() {
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)', overflowX: 'hidden' }}>
 
       {/* subtle dot-grid bg texture */}
-      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, backgroundImage: 'radial-gradient(circle, rgba(104,109,85,0.06) 1px, transparent 1px)', backgroundSize: '36px 36px', pointerEvents: 'none' }} />
+      <div aria-hidden style={{ position: 'fixed', inset: 0, zIndex: 0, backgroundImage: 'radial-gradient(circle, rgba(0,168,150,0.06) 1px, transparent 1px)', backgroundSize: '36px 36px', pointerEvents: 'none' }} />
 
       {/* ── Navbar ── */}
       <nav style={{
@@ -100,13 +101,13 @@ export default function Home() {
         position: 'sticky', top: 0, zIndex: 50,
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         backdropFilter: 'blur(16px)',
-        background: '#0b1d3a',
+        background: 'var(--nav-bg)',
       }}>
         <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', height: '80px', justifyContent: 'space-between' }}>
 
           {/* Logo */}
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(0,168,150,0.35)' }}>C</div>
             <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
           </Link>
 
@@ -122,12 +123,23 @@ export default function Home() {
 
           {/* Right CTA — desktop */}
           <div className="desktop-cta" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexShrink: 0 }}>
-            <Link href="/login" className="btn-primary" style={{
-              padding: '0.65rem 1.4rem',
-              fontSize: '1rem',
-              borderRadius: '12px',
+            <QRScannerButton variant="nav" />
+            <Link href="/login" style={{
+              padding: '0.6rem 1.25rem',
+              fontSize: '0.95rem',
+              fontWeight: 600,
+              color: '#ffffff',
               textDecoration: 'none',
-            }}>Get Started</Link>
+              borderRadius: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              transition: 'all 0.15s',
+            }}>Sign In</Link>
+            <Link href="/register" className="btn-primary" style={{
+              padding: '0.65rem 1.4rem',
+              fontSize: '0.95rem',
+              borderRadius: '10px',
+              textDecoration: 'none',
+            }}>Sign Up</Link>
           </div>
 
           {/* Hamburger — mobile */}
@@ -145,7 +157,10 @@ export default function Home() {
               <PageContainer style={{ padding: '1.5rem 1.75rem', display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                 {NAV_LINKS.map(l => <a key={l.label} href={l.href} style={{ fontSize: '1.15rem', color: 'var(--text-muted)', textDecoration: 'none', padding: '0.6rem 0', fontWeight: 600 }} onClick={() => setMenuOpen(false)}>{l.label}</a>)}
                 <hr style={{ border: 'none', borderTop: '1px solid var(--surface-border)', margin: '0.25rem 0' }} />
-                <Link href="/login" className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => setMenuOpen(false)}>Get Started</Link>
+                <div style={{ display: 'flex', gap: '0.75rem' }}>
+                  <Link href="/login" style={{ flex: 1, padding: '0.75rem', textAlign: 'center', color: 'var(--text-main)', border: '1px solid var(--surface-border)', borderRadius: '10px', textDecoration: 'none', fontWeight: 600 }} onClick={() => setMenuOpen(false)}>Sign In</Link>
+                  <Link href="/register" className="btn-primary" style={{ flex: 1, justifyContent: 'center' }} onClick={() => setMenuOpen(false)}>Sign Up</Link>
+                </div>
               </PageContainer>
             </motion.div>
           )}
@@ -179,6 +194,9 @@ export default function Home() {
                 </Link>
               </motion.div>
               <motion.div whileTap={{ scale: 0.95 }} transition={{ duration: 0.1 }} style={{ display: 'inline-block' }}>
+                <QRScannerButton variant="hero" />
+              </motion.div>
+              <motion.div whileTap={{ scale: 0.95 }} transition={{ duration: 0.1 }} style={{ display: 'inline-block' }}>
                 <a href="#how" className="btn-ghost" style={{ padding: '1.1rem 2.1rem', fontSize: '1.15rem' }}>
                   How it Works
                 </a>
@@ -200,7 +218,7 @@ export default function Home() {
           <motion.div initial={{ opacity: 0, x: 24, y: 8 }} animate={{ opacity: 1, x: 0, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
             style={{ position: 'relative' }}>
             {/* glow behind image */}
-            <div aria-hidden style={{ position: 'absolute', inset: '-24px', borderRadius: '28px', background: 'radial-gradient(ellipse at center, rgba(104,109,85,0.15) 0%, transparent 70%)', filter: 'blur(28px)', zIndex: 0 }} />
+            <div aria-hidden style={{ position: 'absolute', inset: '-24px', borderRadius: '28px', background: 'radial-gradient(ellipse at center, rgba(0,168,150,0.15) 0%, transparent 70%)', filter: 'blur(28px)', zIndex: 0 }} />
             <div style={{ position: 'relative', zIndex: 1, borderRadius: '20px', overflow: 'hidden', border: '1px solid var(--surface-border)', boxShadow: '0 24px 48px rgba(0,0,0,0.12)', background: 'var(--surface-card)' }}>
               <Image
                 src="/dashboard-mockup.png"
@@ -233,10 +251,10 @@ export default function Home() {
             <p style={{ color: 'var(--text-muted)', fontSize: '1.15rem', marginTop: '0.6rem' }}>Real complaints stored and categorized in the system</p>
           </div>
           <div style={{ display: 'flex', gap: '1.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <StatCard icon={ClipboardList} label="Total Complaints"  rawValue={liveStats.total} color="var(--accent)"   glow="rgba(104,109,85,0.22)"  delay={0} />
-            <StatCard icon={CheckCircle2} label="Resolved"          rawValue={liveStats.resolved} color="var(--success)"  glow="rgba(90,122,82,0.22)"  delay={0.07} />
-            <StatCard icon={Cog}          label="In Progress"        rawValue={liveStats.inProgress} color="var(--warning)"  glow="rgba(160,124,58,0.22)"  delay={0.14} />
-            <StatCard icon={AlertTriangle}label="Critical Issues"   rawValue={liveStats.critical} color="var(--danger)"   glow="rgba(160,64,64,0.22)"   delay={0.21} />
+            <StatCard icon={ClipboardList} label="Total Complaints"  rawValue={liveStats.total} color="var(--accent)"   glow="rgba(0,168,150,0.22)"   delay={0} />
+            <StatCard icon={CheckCircle2} label="Resolved"          rawValue={liveStats.resolved} color="var(--success)"  glow="rgba(13,148,136,0.22)"  delay={0.07} />
+            <StatCard icon={Cog}          label="In Progress"        rawValue={liveStats.inProgress} color="var(--warning)"  glow="rgba(217,119,6,0.22)"   delay={0.14} />
+            <StatCard icon={AlertTriangle}label="Critical Issues"   rawValue={liveStats.critical} color="var(--danger)"   glow="rgba(220,38,38,0.22)"   delay={0.21} />
           </div>
         </PageContainer>
       </section>
@@ -304,7 +322,7 @@ export default function Home() {
         <PageContainer>
           <motion.div
             initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            style={{ background: 'var(--surface-card)', border: '1px solid var(--accent-border)', borderRadius: '20px', padding: 'clamp(3rem,6vw,4.5rem)', textAlign: 'center', boxShadow: '0 8px 32px rgba(104,109,85,0.12)', position: 'relative', overflow: 'hidden' }}>
+            style={{ background: 'var(--surface-card)', border: '1px solid var(--accent-border)', borderRadius: '20px', padding: 'clamp(3rem,6vw,4.5rem)', textAlign: 'center', boxShadow: '0 8px 32px rgba(15,45,86,0.10)', position: 'relative', overflow: 'hidden' }}>
             <h2 style={{ fontSize: 'clamp(1.85rem, 4vw, 2.85rem)', fontWeight: 800, marginBottom: '1rem' }}>Ready to report an issue?</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '1.25rem', marginBottom: '2.25rem' }}>Join citizens holding their municipalities accountable.</p>
             <motion.div whileTap={{ scale: 0.95 }} style={{ display: 'inline-block' }}>
@@ -322,7 +340,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px,1fr) repeat(2, auto)', gap: '3.5rem 6rem', flexWrap: 'wrap', marginBottom: '3.5rem' }} className="footer-grid">
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.15rem', boxShadow: '0 4px 12px rgba(16,185,129,0.3)' }}>C</div>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'var(--accent)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.15rem', boxShadow: '0 4px 12px rgba(0,168,150,0.3)' }}>C</div>
                 <span style={{ fontWeight: 800, fontSize: '1.2rem' }}>CivicAI</span>
               </div>
               <p style={{ fontSize: '1rem', color: 'var(--text-faint)', lineHeight: 1.7, maxWidth: '280px' }}>AI-powered municipal complaint management for faster civic resolution.</p>

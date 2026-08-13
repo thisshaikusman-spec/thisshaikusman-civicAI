@@ -4,14 +4,43 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import Base, engine, SessionLocal
 from app.models.user_db import UserDB  # noqa: F401
+from app.models.complaint_location_log_db import ComplaintLocationLogDB  # noqa: F401
 from app.services.auth_service import hash_password
 from app.routes.auth import router as auth_router
 from app.routes.complaints import router as complaints_router
 from app.utils.error_handlers import register_exception_handlers
 
+import os
+from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+
 app = FastAPI(title=settings.app_name)
 
+uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
+os.makedirs(uploads_dir, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+
 Base.metadata.create_all(bind=engine)
+
+with engine.connect() as conn:
+    try:
+        conn.execute(text("ALTER TABLE complaints ADD COLUMN is_duplicate BOOLEAN DEFAULT 0"))
+    except Exception:
+        pass
+    try:
+        conn.execute(text("ALTER TABLE complaints ADD COLUMN duplicate_of_id VARCHAR"))
+    except Exception:
+        pass
+    try:
+        conn.execute(text("ALTER TABLE complaints ADD COLUMN photos VARCHAR"))
+    except Exception:
+        pass
+    try:
+        conn.execute(text("ALTER TABLE complaints ADD COLUMN photos_metadata VARCHAR"))
+    except Exception:
+        pass
+    conn.commit()
+
 register_exception_handlers(app)
 
 def seed_demo_users():
@@ -40,13 +69,21 @@ def seed_demo_users():
 
 seed_demo_users()
 
-dev_origins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:3000", "http://127.0.0.1:3000"]
-origins = ["*"]
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+if settings.frontend_url and settings.frontend_url not in origins:
+    origins.append(settings.frontend_url)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=False,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -60,7 +97,13 @@ async def security_headers_middleware(request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     if getattr(settings, "app_env", "development") == "production":
         response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
-    response.headers.setdefault("Content-Security-Policy", "default-src 'self';")
+    if request.url.path in ["/docs", "/redoc", "/openapi.json"]:
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "img-src 'self' data: https://fastapi.tiangolo.com;"
+        )
     return response
 
 app.include_router(complaints_router, prefix="/complaints", tags=["complaints"])

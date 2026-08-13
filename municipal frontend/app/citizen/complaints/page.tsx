@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ProfileMenu from '@/components/ProfileMenu'
 import PageContainer from '@/components/PageContainer'
+import ComplaintMapWrapper from '@/components/ComplaintMapWrapper'
 
 interface ComplaintResponse {
   complaint_id: string
@@ -29,6 +30,7 @@ export default function CitizenComplaintsPage() {
   const [error, setError] = useState('')
   const [withdrawingId, setWithdrawingId] = useState<string | null>(null)
   const [confirmingId, setConfirmingId] = useState<string | null>(null)
+  const [expandedMapId, setExpandedMapId] = useState<string | null>(null)
 
   const handleWithdrawComplaint = async (complaintId: string) => {
     setWithdrawingId(complaintId)
@@ -127,11 +129,11 @@ export default function CitizenComplaintsPage() {
         position: 'sticky', top: 0, zIndex: 50,
         borderBottom: '1px solid rgba(255, 255, 255, 0.12)',
         backdropFilter: 'blur(16px)',
-        background: '#0b1d3a',
+        background: 'var(--nav-bg)',
       }}>
         <div style={{ width: '100%', padding: '0 2.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '80px' }}>
           <Link href="/citizen/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: '#10b981', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}>C</div>
+            <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: 'var(--accent)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.35rem', boxShadow: '0 4px 16px rgba(0,168,150,0.35)' }}>C</div>
             <span style={{ fontWeight: 800, fontSize: '1.4rem', color: '#ffffff', letterSpacing: '-0.01em' }}>CivicAI</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -205,7 +207,7 @@ export default function CitizenComplaintsPage() {
                         <p className="text-sm mt-1.5 line-clamp-2" style={{ color: 'var(--text-muted)' }}>{complaint.description}</p>
                       </div>
                       <div className="text-right text-xs whitespace-nowrap flex flex-col items-end gap-1.5" style={{ color: 'var(--text-faint)' }}>
-                        <div>{new Date(complaint.created_at).toLocaleDateString()}</div>
+                        <div suppressHydrationWarning>{new Date(complaint.created_at).toLocaleDateString('en-GB')}</div>
                         <div className="font-medium" style={{ color: 'var(--text-muted)' }}>{complaint.location}</div>
                         {confirmingId === complaint.complaint_id ? (
                           <div className="flex items-center gap-1.5 mt-1">
@@ -267,20 +269,42 @@ export default function CitizenComplaintsPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs mt-4 pt-3" style={{ borderTop: '1px solid var(--surface-border)', color: 'var(--text-muted)' }}>
-                      <span className="flex items-center gap-1">
-                        <span>📁</span> {complaint.category}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span>🏢</span> {complaint.department}
-                      </span>
-                      <span className="font-semibold" style={{ color: getPriorityColor(complaint.priority) }}>
-                        ↑ {complaint.priority}
-                      </span>
-                      <span className="flex items-center gap-1" style={{ color: 'var(--accent)' }}>
-                        <span>🤖</span> {Math.round((complaint.confidence || 0) * 100)}% AI confidence
-                      </span>
+                    <div className="flex flex-wrap items-center justify-between gap-4 text-xs mt-4 pt-3" style={{ borderTop: '1px solid var(--surface-border)', color: 'var(--text-muted)' }}>
+                      <div className="flex flex-wrap items-center gap-4">
+                        <span className="flex items-center gap-1">
+                          <span>📁</span> {complaint.category}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span>🏢</span> {complaint.department}
+                        </span>
+                        <span className="font-semibold" style={{ color: getPriorityColor(complaint.priority) }}>
+                          ↑ {complaint.priority}
+                        </span>
+                        <span className="flex items-center gap-1" style={{ color: 'var(--accent)' }}>
+                          <span>🤖</span> {Math.round((complaint.confidence || 0) * 100)}% AI confidence
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setExpandedMapId(expandedMapId === complaint.complaint_id ? null : complaint.complaint_id)}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border"
+                        style={{
+                          background: expandedMapId === complaint.complaint_id ? 'rgba(59, 130, 246, 0.15)' : 'var(--surface-hover)',
+                          color: expandedMapId === complaint.complaint_id ? '#60a5fa' : 'var(--text-muted)',
+                          borderColor: expandedMapId === complaint.complaint_id ? 'rgba(59, 130, 246, 0.3)' : 'var(--surface-border)',
+                        }}
+                      >
+                        <span>🗺️</span> {expandedMapId === complaint.complaint_id ? 'Hide Live Map' : 'Track Live Location'}
+                      </button>
                     </div>
+
+                    {/* Expandable Live Location Map */}
+                    {expandedMapId === complaint.complaint_id && (
+                      <div className="mt-4 pt-2">
+                        <ComplaintMapWrapper complaint={complaint} />
+                      </div>
+                    )}
 
                     {/* Progress bar */}
                     <div className="mt-4 pt-2">

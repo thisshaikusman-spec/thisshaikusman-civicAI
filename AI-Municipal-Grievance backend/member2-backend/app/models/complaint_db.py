@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Float, Integer, String
+from sqlalchemy import Boolean, Column, DateTime, Float, Integer, String
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -17,6 +18,8 @@ class ComplaintDB(Base):
     description = Column(String, nullable=False)
     location = Column(String, nullable=False)
     image_url = Column(String, nullable=True)
+    photos = Column(String, nullable=True)
+    photos_metadata = Column(String, nullable=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     category = Column(String, nullable=False)
@@ -24,5 +27,11 @@ class ComplaintDB(Base):
     priority = Column(String, nullable=False)
     confidence = Column(Float, nullable=False)
     status = Column(String, nullable=False, default="Submitted")
+    is_duplicate = Column(Boolean, default=False, nullable=True)
+    duplicate_of_id = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    location_logs = relationship("ComplaintLocationLogDB", back_populates="complaint", cascade="all, delete-orphan")
+
+

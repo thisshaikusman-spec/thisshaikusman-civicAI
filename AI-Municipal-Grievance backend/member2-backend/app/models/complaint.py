@@ -1,7 +1,7 @@
 from typing import Literal, Optional
 from datetime import datetime
 
-from pydantic import BaseModel, EmailStr, confloat, constr
+from pydantic import BaseModel, EmailStr, Field
 
 
 AllowedComplaintStatuses = Literal[
@@ -9,19 +9,33 @@ AllowedComplaintStatuses = Literal[
     "In Progress",
     "Resolved",
     "Rejected",
+    "Location Unverified",
 ]
 
 
+class PhotoMetadata(BaseModel):
+    photo_url: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    accuracy: Optional[float] = None
+    captured_at: Optional[str] = None
+    is_verified: Optional[bool] = False
+    source: Optional[str] = "gallery"
+
+
 class ComplaintCreate(BaseModel):
-    name: constr(strip_whitespace=True, min_length=1)
+    name: str = Field(..., min_length=1)
     email: EmailStr
-    phone: constr(strip_whitespace=True, min_length=1)
-    title: constr(strip_whitespace=True, min_length=1)
-    description: constr(strip_whitespace=True, min_length=1)
-    location: constr(strip_whitespace=True, min_length=1)
-    latitude: confloat(ge=-90, le=90)
-    longitude: confloat(ge=-180, le=180)
+    phone: str = Field(..., min_length=1)
+    title: str = Field(..., min_length=1)
+    description: str = Field(..., min_length=1)
+    location: str = Field(..., min_length=1)
+    latitude: Optional[float] = Field(None, ge=-90, le=90)
+    longitude: Optional[float] = Field(None, ge=-180, le=180)
     category: Optional[str] = None
+    image_url: Optional[str] = None
+    photos: Optional[list[str]] = []
+    photos_metadata: Optional[list[PhotoMetadata]] = []
 
 
 class ComplaintStatusUpdate(BaseModel):
@@ -50,8 +64,14 @@ class ComplaintResponse(BaseModel):
     location: str
     latitude: float
     longitude: float
+    image_url: Optional[str] = None
+    photos: Optional[list[str]] = []
+    photos_metadata: Optional[list[PhotoMetadata]] = []
+    is_duplicate: Optional[bool] = False
+    duplicate_of_id: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+
 
 
 class ComplaintListResponse(BaseModel):
@@ -73,4 +93,34 @@ class AnalyzeResponse(BaseModel):
     risk_level: str
     risk_factors: list[str]
     ai_assessment: str
+
+
+class TrackLocationRequest(BaseModel):
+    latitude: float = Field(..., ge=-90, le=90)
+    longitude: float = Field(..., ge=-180, le=180)
+    accuracy: Optional[float] = None
+    tracked_by: Optional[str] = None
+    source: Optional[str] = None
+    timestamp: Optional[datetime] = None
+
+
+class LocationLogItem(BaseModel):
+    id: int
+    complaint_id: str
+    latitude: float
+    longitude: float
+    accuracy: Optional[float] = None
+    tracked_by: str
+    source: Optional[str] = "field_officer"
+    timestamp: datetime
+
+
+class TrackingHistoryResponse(BaseModel):
+    complaint_id: str
+    status: str
+    is_tracking_active: bool
+    count: int
+    history: list[LocationLogItem]
+
+
 

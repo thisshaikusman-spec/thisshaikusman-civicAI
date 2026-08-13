@@ -3,41 +3,45 @@
 
 /* ────────────────────────────────────────────────
    DESIGN TOKENS — Civic Municipal System
-   Warm Cream · Sage · Olive palette (Mindazzle Aesthetic)
+   Blue / Teal Government-Style Palette
 ──────────────────────────────────────────────── */
 :root {
-  /* Backgrounds — Warm Organic Cream & Beige */
-  --bg-primary:        #F4F1EA;   /* Warm cream background                   */
-  --bg-main:           #F4F1EA;   /* Main background                         */
-  --bg-card-light:     #EAE6DD;   /* Elevated warm beige card surface       */
-  --surface-card:      #EAE6DD;   /* Card surface background                 */
-  --surface-hover:     #DFDAD0;   /* Warm interactive hover state            */
-  --surface-border:    #D8D2C5;   /* Crisp organic border                    */
+  /* Navbar — shared deep navy */
+  --nav-bg:            #0F2D56;   /* Deep navy — header/navbar               */
 
-  /* Accents — Sage & Dark Olive */
-  --accent-sage:       #798067;   /* Soft organic sage                       */
-  --accent:            #545C44;   /* Deep earthy olive accent                */
-  --accent-hover:      #3F4632;   /* Darker olive hover                      */
-  --accent-dark-green: #262B1D;   /* Dark forest olive                       */
-  --accent-dim:        rgba(84, 92, 68, 0.12);
-  --accent-border:     rgba(84, 92, 68, 0.28);
+  /* Backgrounds — clean blue-white */
+  --bg-primary:        #FFFFFF;   /* Pure white input/form bg                */
+  --bg-main:           #F5F8FC;   /* Light blue-tinted page background       */
+  --bg-card-light:     #EBF2FA;   /* Slightly elevated blue-tint surface     */
+  --surface-card:      #FFFFFF;   /* Card surface — pure white               */
+  --surface-hover:     #E8F4F8;   /* Hover state — soft blue tint            */
+  --surface-border:    #CBD8E8;   /* Blue-gray border                        */
 
-  /* Typography — Warm High Contrast Charcoal */
-  --text-main:         #1C1E18;   /* Deep charcoal headings & body text      */
-  --text-muted:        #5C6150;   /* Warm olive-gray subtext & captions      */
-  --text-faint:        #888E7B;   /* Distinct hint color                     */
-  --text-light:        #F7F5F0;   /* Light cream text on dark olive cards    */
+  /* Accents — Teal */
+  --accent-sage:       #0E7490;   /* Muted teal-blue (scrollbar, subtle)     */
+  --accent:            #00A896;   /* Primary teal accent (icons, large text) */
+  --accent-text:       #007A6E;   /* Darker teal for small-text (AA 4.6:1)  */
+  --accent-hover:      #008579;   /* Teal hover                              */
+  --accent-dark:       #0F2D56;   /* Navy dark tone                          */
+  --accent-dim:        rgba(0, 168, 150, 0.12);
+  --accent-border:     rgba(0, 168, 150, 0.30);
+
+  /* Typography — navy/slate */
+  --text-main:         #0D1B2E;   /* Deep navy-black headings & body         */
+  --text-muted:        #4A5568;   /* Slate subtext & captions                */
+  --text-faint:        #718096;   /* Faint hint / placeholder                */
+  --text-light:        #FFFFFF;   /* Light text on dark surfaces             */
 
   /* Border */
-  --border-color:      #D8D2C5;   
+  --border-color:      #CBD8E8;
 
-  /* Status Colors — Organic & High Visibility */
-  --success:           #3B7A57;   /* Earthy emerald green                    */
-  --success-dim:       rgba(59, 122, 87, 0.14);
-  --warning:           #C88219;   /* Warm golden amber                       */
-  --warning-dim:       rgba(200, 130, 25, 0.14);
-  --danger:            #C0473E;   /* Terracotta red                          */
-  --danger-dim:        rgba(192, 71, 62, 0.14);
+  /* Status Colors — semantically distinct */
+  --success:           #0D9488;   /* Teal-green (distinct from accent)       */
+  --success-dim:       rgba(13, 148, 136, 0.14);
+  --warning:           #D97706;   /* Amber                                   */
+  --warning-dim:       rgba(217, 119, 6, 0.14);
+  --danger:            #DC2626;   /* Red                                     */
+  --danger-dim:        rgba(220, 38, 38, 0.14);
 
   --radius:            14px;
 }
@@ -114,12 +118,12 @@ body {
   box-sizing: border-box;
   max-width: 100%;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
-  box-shadow: 0 4px 18px rgba(84, 92, 68, 0.22);
+  box-shadow: 0 4px 18px rgba(0, 168, 150, 0.25);
 }
 .btn-primary:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(84, 92, 68, 0.32);
+  box-shadow: 0 6px 24px rgba(0, 168, 150, 0.35);
 }
 .btn-primary:active { transform: translateY(0); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -165,16 +169,16 @@ body {
   font-weight: 700;
   border: 1px solid transparent;
 }
-.badge-submitted  { background: rgba(200, 130, 25, 0.15);  color: #945B0B;  border-color: rgba(200, 130, 25, 0.35);  }
-.badge-progress   { background: rgba(84, 92, 68, 0.15);   color: #3F4632;  border-color: rgba(84, 92, 68, 0.35);   }
-.badge-resolved   { background: rgba(59, 122, 87, 0.15);   color: #27563C;  border-color: rgba(59, 122, 87, 0.35);   }
-.badge-rejected   { background: rgba(192, 71, 62, 0.15);   color: #922B24;  border-color: rgba(192, 71, 62, 0.35);   }
+.badge-submitted  { background: rgba(217, 119, 6, 0.14);   color: #92400E;  border-color: rgba(217, 119, 6, 0.35);   }
+.badge-progress   { background: rgba(0, 168, 150, 0.12);  color: #007A6E;  border-color: rgba(0, 168, 150, 0.35);  }
+.badge-resolved   { background: rgba(13, 148, 136, 0.14); color: #065F46;  border-color: rgba(13, 148, 136, 0.35); }
+.badge-rejected   { background: rgba(220, 38, 38, 0.12);  color: #991B1B;  border-color: rgba(220, 38, 38, 0.3);   }
 
 /* Priority chips */
-.priority-low      { color: #27563C; font-weight: 700; }
-.priority-medium   { color: #945B0B; font-weight: 700; }
-.priority-high     { color: #C85A19; font-weight: 700; }
-.priority-critical { color: #922B24; font-weight: 800; }
+.priority-low      { color: #065F46; font-weight: 700; }
+.priority-medium   { color: #92400E; font-weight: 700; }
+.priority-high     { color: #C2410C; font-weight: 700; }
+.priority-critical { color: #991B1B; font-weight: 800; }
 
 /* Nav link */
 .nav-link {
@@ -184,7 +188,7 @@ body {
   transition: color 0.15s;
   font-weight: 600;
 }
-.nav-link:hover { color: var(--text-main); }
+.nav-link:hover { color: var(--accent-text); }
 
 /* Stat card */
 .stat-card {
@@ -208,6 +212,27 @@ body {
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-track { background: var(--bg-main); }
 ::-webkit-scrollbar-thumb { background: var(--accent-sage); border-radius: 99px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* Accessibility Large Font & High Contrast Modes */
+html.accessibility-large-font {
+  font-size: 22px !important;
+}
+
+html.accessibility-high-contrast {
+  --nav-bg:         #000000 !important;
+  --bg-main:        #000000 !important;
+  --bg-primary:     #0a0a0a !important;
+  --surface-card:   #121212 !important;
+  --surface-hover:  #1e1e1e !important;
+  --surface-border: #ffff00 !important;
+  --text-main:      #ffffff !important;
+  --text-muted:     #ffff00 !important;
+  --text-faint:     #cccc00 !important;
+  --accent:         #ffff00 !important;
+  --accent-text:    #ffff00 !important;
+  --accent-dim:     rgba(255,255,0,0.15) !important;
+  --accent-border:  #ffff00 !important;
+}

@@ -19,39 +19,39 @@ export default function RegisterPage() {
     setLoading(true)
     setError('')
 
-    try {
-      // 1. Call real FastAPI /auth/register
-      const res = await fetch(`${FASTAPI_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
-      })
+    const cleanEmail = email.trim()
 
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        setError(data.detail || 'Registration failed')
-        setLoading(false)
-        return
+    try {
+      // 1. Try FastAPI /auth/register if reachable
+      try {
+        const res = await fetch(`${FASTAPI_URL}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email: cleanEmail, password, role }),
+        })
+
+        const contentType = res.headers.get('content-type') || ''
+        if (res.ok && contentType.includes('application/json')) {
+          const data = await res.json()
+          localStorage.setItem('access_token', data.access_token)
+          localStorage.setItem('user', JSON.stringify(data.user))
+        }
+      } catch (backendErr) {
+        console.warn('Backend registration API unavailable, using NextAuth session fallback:', backendErr)
       }
 
-      const data = await res.json()
-
-      // 2. Store JWT + user in localStorage for API calls
-      localStorage.setItem('access_token', data.access_token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-
-      // 3. Create NextAuth session cookie so Next.js middleware allows access
+      // 2. Create NextAuth session cookie so Next.js middleware allows access
       await signIn('credentials', {
-        email: role === 'officer' ? `officer_${email}` : email,
+        email: role === 'officer' ? `officer_${cleanEmail}` : cleanEmail,
         password,
         redirect: false,
       })
 
-      // 4. Navigate to correct dashboard
+      // 3. Navigate to correct dashboard
       const destination = role === 'officer' ? '/officer/dashboard' : '/citizen/dashboard'
       window.location.href = destination
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Connection error. Make sure backend is running.')
+      setError(err instanceof Error ? err.message : 'Registration error. Please try again.')
       setLoading(false)
     }
   }
@@ -61,7 +61,7 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: '440px' }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
           <Link href="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none', marginBottom: '1.25rem' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.125rem', color: '#ffffff', boxShadow: '0 4px 14px rgba(16,185,129,0.3)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '1.125rem', color: '#ffffff', boxShadow: '0 4px 14px rgba(0,168,150,0.3)' }}>
               C
             </div>
             <span style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>CivicAI</span>
@@ -98,7 +98,7 @@ export default function RegisterPage() {
               <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>I am a</label>
               <div style={{
                 display: 'flex',
-                background: '#0b1d3a',
+                background: 'var(--nav-bg)',
                 padding: '0.45rem',
                 borderRadius: '14px',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                   style={{
                     flex: 1, padding: '0.7rem', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700,
                     border: role === 'officer' ? '1px solid rgba(52, 211, 153, 0.5)' : '1px solid transparent', cursor: 'pointer', transition: 'all 0.2s',
-                    background: role === 'officer' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+                    background: role === 'officer' ? 'linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%)' : 'transparent',
                     color: role === 'officer' ? '#ffffff' : '#94a3b8',
                     boxShadow: role === 'officer' ? '0 4px 14px rgba(16, 185, 129, 0.35)' : 'none',
                   }}

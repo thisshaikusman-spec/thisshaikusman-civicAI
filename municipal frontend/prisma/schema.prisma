@@ -118,6 +118,19 @@ model Complaint {
   supports        ComplaintSupport[]
   notifications   Notification[]
   aiAnalysis      AIAnalysis?
+  locationLogs    ComplaintLocationLog[]
+}
+
+model ComplaintLocationLog {
+  id          String   @id @default(cuid())
+  complaintId String
+  latitude    Float
+  longitude   Float
+  accuracy    Float?
+  trackedBy   String   @default("field_officer")
+  timestamp   DateTime @default(now())
+
+  complaint   Complaint @relation(fields: [complaintId], references: [civicId], onDelete: Cascade)
 }
 
 model ComplaintEvidence {

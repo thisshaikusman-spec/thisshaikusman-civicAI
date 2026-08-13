@@ -52,14 +52,14 @@ export default function OfficerAnalyticsPage() {
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-main)', color: 'var(--text-main)' }}>
       {/* Navbar */}
-      <nav style={{ background: '#0b1d3a', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', width: '100%' }}>
+      <nav style={{ background: 'var(--nav-bg)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', width: '100%' }}>
         <div style={{ width: '100%', padding: '1rem 2.5rem' }} className="flex items-center justify-between">
           <Link href="/officer/dashboard" className="flex items-center gap-2.5 text-decoration-none">
             <div 
               style={{
-                background: '#10b981',
+                background: 'var(--accent)',
                 color: '#ffffff',
-                boxShadow: '0 4px 14px rgba(16,185,129,0.35)',
+                boxShadow: '0 4px 14px rgba(0,168,150,0.35)',
               }}
               className="w-9 h-9 rounded-xl flex items-center justify-center font-extrabold text-base"
             >

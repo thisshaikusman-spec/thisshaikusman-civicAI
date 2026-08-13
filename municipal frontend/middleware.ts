@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server'
 // Use the edge-safe auth config (no Prisma, no Node.js-only modules)
 const { auth } = NextAuth(authConfig)
 
-const PUBLIC_PATHS = ['/', '/login', '/api/auth']
+const PUBLIC_PATHS = ['/', '/login', '/register', '/admin/login', '/api/auth']
 
 export default auth((req) => {
   const { pathname } = req.nextUrl
