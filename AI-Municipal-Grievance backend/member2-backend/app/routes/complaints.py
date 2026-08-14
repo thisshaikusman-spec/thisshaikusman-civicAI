@@ -4,6 +4,12 @@ import uuid
 from datetime import datetime, timedelta
 from typing import List, Optional
 
+try:
+    import httpx
+except ImportError:
+    httpx = None
+
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -135,9 +141,8 @@ async def transcribe_audio(
 
     openai_key = os.getenv("OPENAI_API_KEY")
 
-    if openai_key:
+    if openai_key and httpx is not None:
         try:
-            import httpx
             async with httpx.AsyncClient(timeout=30.0) as client:
                 files_payload = {
                     "file": (file.filename or "recording.webm", contents, file.content_type or "audio/webm"),
