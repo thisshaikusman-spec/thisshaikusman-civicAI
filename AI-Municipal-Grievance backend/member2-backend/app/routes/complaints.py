@@ -96,8 +96,10 @@ async def upload_evidence(files: List[UploadFile] = File(...)):
     if len(files) > 3:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum 3 images allowed.")
 
-    saved_urls = []
-    uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "uploads"))
+    if os.environ.get("VERCEL"):
+        uploads_dir = "/tmp/uploads"
+    else:
+        uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "uploads"))
     os.makedirs(uploads_dir, exist_ok=True)
 
     for file in files:

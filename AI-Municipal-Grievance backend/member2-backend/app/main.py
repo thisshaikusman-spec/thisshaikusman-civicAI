@@ -23,56 +23,67 @@ from sqlalchemy import text
 
 app = FastAPI(title=settings.app_name)
 
-uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
-os.makedirs(uploads_dir, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+if os.environ.get("VERCEL"):
+    uploads_dir = "/tmp/uploads"
+else:
+    uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "uploads"))
 
-Base.metadata.create_all(bind=engine)
+try:
+    os.makedirs(uploads_dir, exist_ok=True)
+    if os.path.exists(uploads_dir):
+        app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
+except Exception as err:
+    print(f"Warning: Could not setup uploads directory: {err}")
 
-with engine.connect() as conn:
-    try:
-        conn.execute(text("ALTER TABLE complaints ADD COLUMN is_duplicate BOOLEAN DEFAULT 0"))
-    except Exception:
-        pass
-    try:
-        conn.execute(text("ALTER TABLE complaints ADD COLUMN duplicate_of_id VARCHAR"))
-    except Exception:
-        pass
-    try:
-        conn.execute(text("ALTER TABLE complaints ADD COLUMN photos VARCHAR"))
-    except Exception:
-        pass
-    try:
-        conn.execute(text("ALTER TABLE complaints ADD COLUMN photos_metadata VARCHAR"))
-    except Exception:
-        pass
-    conn.commit()
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as err:
+    print(f"Warning: Base.metadata.create_all failed: {err}")
+
+try:
+    with engine.connect() as conn:
+        for col_sql in [
+            "ALTER TABLE complaints ADD COLUMN is_duplicate BOOLEAN DEFAULT 0",
+            "ALTER TABLE complaints ADD COLUMN duplicate_of_id VARCHAR",
+            "ALTER TABLE complaints ADD COLUMN photos VARCHAR",
+            "ALTER TABLE complaints ADD COLUMN photos_metadata VARCHAR",
+        ]:
+            try:
+                conn.execute(text(col_sql))
+            except Exception:
+                pass
+        conn.commit()
+except Exception as err:
+    print(f"Warning: DB migration failed: {err}")
 
 register_exception_handlers(app)
 
 def seed_demo_users():
-    db = SessionLocal()
     try:
-        if not db.query(UserDB).filter(UserDB.email == "citizen@demo.com").first():
-            db.add(UserDB(
-                name="Demo Citizen",
-                email="citizen@demo.com",
-                password_hash=hash_password("demo123"),
-                role="citizen",
-            ))
-        if not db.query(UserDB).filter(UserDB.email == "officer@demo.com").first():
-            db.add(UserDB(
-                name="Demo Officer",
-                email="officer@demo.com",
-                password_hash=hash_password("demo123"),
-                role="officer",
-            ))
-        db.commit()
+        db = SessionLocal()
+        try:
+            if not db.query(UserDB).filter(UserDB.email == "citizen@demo.com").first():
+                db.add(UserDB(
+                    name="Demo Citizen",
+                    email="citizen@demo.com",
+                    password_hash=hash_password("demo123"),
+                    role="citizen",
+                ))
+            if not db.query(UserDB).filter(UserDB.email == "officer@demo.com").first():
+                db.add(UserDB(
+                    name="Demo Officer",
+                    email="officer@demo.com",
+                    password_hash=hash_password("demo123"),
+                    role="officer",
+                ))
+            db.commit()
+        except Exception as e:
+            print("Demo user seeding warning:", e)
+            db.rollback()
+        finally:
+            db.close()
     except Exception as e:
-        print("Demo user seeding warning:", e)
-        db.rollback()
-    finally:
-        db.close()
+        print("Demo user DB session error:", e)
 
 seed_demo_users()
 

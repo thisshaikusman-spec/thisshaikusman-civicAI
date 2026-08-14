@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 
 
 class Settings(BaseSettings):
@@ -17,5 +18,13 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    @property
+    def effective_database_url(self) -> str:
+        if self.database_url in ("sqlite:///./complaints.db", "sqlite:///complaints.db"):
+            if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+                return "sqlite:////tmp/complaints.db"
+        return self.database_url
+
 
 settings = Settings()
+
