@@ -102,6 +102,7 @@ async def upload_evidence(files: List[UploadFile] = File(...)):
         uploads_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "uploads"))
     os.makedirs(uploads_dir, exist_ok=True)
 
+    saved_urls = []
     for file in files:
         if file.content_type and not file.content_type.startswith("image/"):
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"File '{file.filename}' is not a valid image format.")
